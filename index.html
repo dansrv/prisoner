@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Prisoners Problem Simulation</title>
+    <style>
+        .simulation-box {
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            margin: 1px;
+        }
+        .success {
+            background-color: green;
+        }
+        .failure {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>100 Prisoners Problem Simulation</h1>
+    <label for="simulations">Number of Simulations:</label>
+    <input type="number" id="simulations" name="simulations" min="1">
+    <br>
+    <label for="strategy">Strategy:</label>
+    <select id="strategy">
+        <option value="consensus">Consensus Strategy</option>
+        <option value="random">Randomly Trying</option>
+    </select>
+    <br>
+    <button onclick="runSimulation()">Run Simulation</button>
+    <p id="result"></p>
+    <div id="visual-result"></div>
+
+    <script>
+                async function runSimulation() {
+            const numSimulations = parseInt(document.getElementById('simulations').value);
+            const strategy = document.getElementById('strategy').value;
+            let successCount = 0;
+            const visualResult = document.getElementById('visual-result');
+            visualResult.innerHTML = ''; // Clear previous results
+
+            for (let i = 0; i < numSimulations; i++) {
+                let success = false;
+                if (strategy === 'consensus') {
+                    success = simulatePrisoners();
+                } else {
+                    success = simulateRandomly();
+                }
+
+                if (success) {
+                    successCount++;
+                    visualResult.innerHTML += '<div class="simulation-box success"></div>';
+                } else {
+                    visualResult.innerHTML += '<div class="simulation-box failure"></div>';
+                }
+
+                // Optional delay to see the visual update
+                await new Promise(r => setTimeout(r, 10));
+            }
+
+            const successRate = (successCount / numSimulations) * 100;
+            document.getElementById('result').innerText = `Success Rate: ${successRate.toFixed(2)}%`;
+        }
+
+        function simulatePrisoners() {
+            const N = 100;
+            const boxes = Array.from({ length: N }, (_, i) => i);
+            shuffleArray(boxes);
+
+            for (let i = 0; i < N; i++) {
+                let boxChecked = 0;
+                let currentBox = i;
+
+                while (boxChecked < 50) {
+                    if (boxes[currentBox] === i) {
+                        break;
+                    }
+                    currentBox = boxes[currentBox];
+                    boxChecked++;
+                }
+
+                if (boxChecked === 50) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function simulateRandomly() {
+            const N = 100;
+            const boxes = Array.from({ length: N }, (_, i) => i);
+            shuffleArray(boxes);
+
+            for (let i = 0; i < N; i++) {
+                let boxChecked = 0;
+                let found = false;
+
+                while (boxChecked < 50) {
+                    const randomBox = Math.floor(Math.random() * N);
+                    if (boxes[randomBox] === i) {
+                        found = true;
+                        break;
+                    }
+                    boxChecked++;
+                }
+
+                if (!found) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+    </script>
+</body>
+</html>
